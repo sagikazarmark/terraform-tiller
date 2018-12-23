@@ -1,0 +1,7 @@
+/.helm/
+/.terraform/
+/kubernetes.tf
+/terraform.tfvars
+/*.tfstate
+/*.tfstate.*
+/*.tfstate.backup
