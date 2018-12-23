@@ -21,6 +21,7 @@ module "tiller" {
 ## Configuration
 
 | Name | Default | Description |
+| ---- | ------- | ----------- |
 | rbac_enabled | false | Whether to create role-based access control resources (service account and cluster role binding). |
 | tiller_namespace | kube-system | The Kubernetes namespace to use to deploy Tiller. |
 | tiller_service_account | tiller | The Kubernetes service account to add to Tiller. |
