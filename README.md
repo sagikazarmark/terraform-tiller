@@ -37,8 +37,9 @@ module "tiller" {
 
 After a rather long development and review period Terraform accepted a [Helm provider](https://www.terraform.io/docs/providers/helm/index.html)
 as an official plugin. It provides an option to automatically [install Tiller](https://www.terraform.io/docs/providers/helm/index.html#install_tiller)
-on a cluster if necessary, but unfortunately it's a bit buggy. So I created this terraform module to install Tiller separately from
-the Helm provider.
+on a cluster if necessary, but unfortunately it's a bit buggy and it usually comes with an older Helm/Tiller version
+(at the time of this writing the included version is 2.9.0 while the latest is 2.12.0).
+So I created this terraform module to install Tiller separately from the Helm provider.
 
 
 ## License
