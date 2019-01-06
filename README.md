@@ -33,6 +33,51 @@ module "tiller" {
 | tiller_node_selector | *empty* | Determine which nodes Tiller can land on. |
 
 
+## Initial Chart installation
+
+You might want to preinstall your servers with Kubernetes plugins such as unsupported ingress controllers, right after Tiller is installed. Since Terraform still doesn't support `depends_on` feature on modules, such as this one, there's manual work that needs to be done. This is an example how you can make sure Helm Chart installation starts after the Tiller service is ready:
+
+```hcl
+module "tiller" {
+  ...
+}
+
+resource "null_resource" "install_voyager" {
+  provisioner "local-exec" {
+    command     = "./helm/voyager.sh ${local_file.kube_cluster_yaml.filename}"
+    interpreter = ["bash", "-c"]
+  }
+}
+```
+
+```bash
+#!/usr/bin/env bash
+
+wait_for_tiller () {
+	KUBECONFIG=$1 kubectl --namespace kube-system get pods \
+		--field-selector=status.phase==Running | grep 'tiller-deploy' \
+		| grep '1/1' \
+		> /dev/null 2>&1
+}
+
+until wait_for_tiller $1; do
+	echo "Waiting for tiller-deploy to get ready..."
+	sleep 5
+done
+
+echo "Installing Voyager Ingress..."
+
+helm repo add appscode https://charts.appscode.com/stable --kubeconfig $CWD/../kube_config_cluster.yml
+helm repo update --kubeconfig $CWD/../kube_config_cluster.yml
+
+helm install appscode/voyager --name voyager-operator --version 8.0.1 \
+	--namespace kube-system --set cloudProvider=baremetal \
+	--kubeconfig $1 > /dev/null 2>&1
+
+echo "Voyager Ingress installed!"
+```
+
+
 ## Why
 
 After a rather long development and review period Terraform accepted a [Helm provider](https://www.terraform.io/docs/providers/helm/index.html)
